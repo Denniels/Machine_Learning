@@ -21,7 +21,7 @@ warnings.filterwarnings('ignore')
 def cv_error(x_train,y_train,k, method = 'OLS', alpha = 1):
 
     # set training attr matrix and target
-    Xm, ym = x_train.as_matrix(), y_train.as_matrix()
+    Xm, ym = x_train.to_numpy(), y_train.to_numpy()
     # define kfold manual split
     kf = KFold(n_splits=k)
     # set rmse to 0
@@ -69,13 +69,13 @@ def early_stop(X_train, y_train, alphas, tol = 0.1, estimator = 'OLS'):
 
     cv_alphas, coefs_model, cv_err_model = [], [], []
 
-    if method is 'OLS':
+    if estimator is 'OLS':
         method_type = lm.LinearRegression(fit_intercept=False)
-    elif method is 'ridge':
+    elif estimator is 'ridge':
         method_type = lm.Ridge(fit_intercept=False)
-    elif method is 'lasso':
+    elif estimator is 'lasso':
         method_type = lm.Lasso(fit_intercept=False)
-    elif method is 'enet':
+    elif estimator is 'enet':
         method_type = lm.ElasticNet(fit_intercept=False)
     else:
         raise TypeError("Method argument is not valid")
