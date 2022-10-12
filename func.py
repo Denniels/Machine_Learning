@@ -26,7 +26,7 @@ import sklearn.linear_model as lm
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_squared_error, r2_score, median_absolute_error
 import warnings
 warnings.filterwarnings(action="ignore")
 colors = ["tomato", "darkgoldenrod", "limegreen", "dodgerblue", "sienna", "slategray"]
@@ -243,3 +243,10 @@ def cv_error(x_train,y_train,k, method = 'OLS', alpha = 1):
 
     coefs_dataframe.columns = list(x_train.columns)
     return coefs_dataframe, rmse_cv
+
+def report_metrics(model, x_test, y_test):
+        preds = model.predict(x_test)
+        print(f'''
+        Test R2: {r2_score(y_test, preds)}
+        Test MSE: {mean_squared_error(y_test, preds)}
+        Test Median Absolute Error: {median_absolute_error(y_test, preds)}''')
