@@ -19,6 +19,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import scipy.stats as stats
 import seaborn as sns
+from sklearn.model_selection import KFold
+import sklearn.linear_model as lm
 #from scipy.stats import norm
 #from scipy.stats import t
 from sklearn.linear_model import LogisticRegression
@@ -195,3 +197,49 @@ def polynomial_degrees(m=50):
     plt.ylim(y_lim)
     plt.title(r'$y = \beta_{0} +\sum_{j=1}^{20} \beta_{j} X_{i}^{j} + \varepsilon_{i}$', y=1.1)
     plt.tight_layout()
+
+def cv_error(x_train,y_train,k, method = 'OLS', alpha = 1):
+
+    # set training attr matrix and target
+    Xm, ym = x_train.to_numpy(), y_train.to_numpy()
+    # define kfold manual split
+    kf = KFold(n_splits=k)
+    # set rmse to 0
+    rmse_cv = 0
+    # register coefficients
+    coef_v = []
+
+    # infer model class given function argument
+    if method is 'OLS':
+        method_type = lm.LinearRegression(fit_intercept=False)
+    elif method is 'ridge':
+        method_type = lm.Ridge(alpha=alpha, fit_intercept=False)
+    elif method is 'lasso':
+        method_type = lm.Lasso(alpha = alpha, fit_intercept=False)
+    elif method is 'enet':
+        method_type = lm.ElasticNet(alpha=alpha, fit_intercept=False)
+    else:
+        # raise error if argument isn't valid
+        raise TypeError("Method argument is not valid")
+
+    # for each partition
+    for train_index, validation_index in kf.split(Xm):
+        # instantiate model
+        method_type = method_type
+        # fit on randomized training
+        method_type.fit(Xm[train_index], ym[train_index])
+        # append estimates
+        coef_v.append(method_type.coef_)
+        # create predictions
+        yhat_validation = method_type.predict(Xm[validation_index])
+        # update rmse metric
+        rmse_cv += np.mean(np.power(yhat_validation - ym[validation_index], 2))
+
+    # create a dataframe containing coeficients
+    coefs_dataframe = pd.DataFrame(
+        # for each inner array, rearrange coeficients
+        [[fold[x] for x in range(x_train.shape[1])] for fold in coef_v]
+    )
+
+    coefs_dataframe.columns = list(x_train.columns)
+    return coefs_dataframe, rmse_cv
