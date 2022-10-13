@@ -6,7 +6,7 @@ File: func.py
 Author: Daniel Mardones
 Email: daniel[dot]mardones[dot]s[at]gmail[dot]com
 Github: https://github.com/Denniels
-Description: Funciones para prueba modulo DataSciens
+Description: Funciones para Desafío - Expansiones basales
 """
 
 #import argparse
@@ -69,30 +69,30 @@ def form_model(df, var_obj):
     return base_formula[:-3]
 
 def predict(df, var_obj):
-        """Función que automatiza las predicciones por LogisticRegression.
+    """Función que automatiza las predicciones por LogisticRegression.
 
-        Args:
-                df (dataframe): dataframe con todas las variables a introducir 
-                en el modelo, incluida la V.O.
-                var_obj (str): variable objetivo
+    Args:
+        df (dataframe): dataframe con todas las variables a introducir 
+        en el modelo, incluida la V.O.
+        var_obj (str): variable objetivo
 
-        Returns:
-                array: vector de prueba y vector de predicciones
-        """
-        # separando matriz de atributos de vector objetivo
-        # utilizamos dataframe con variables significativas
-        mat_atr = df.drop(var_obj, axis=1)
-        vec_obj = df[var_obj]
-        # split de conjuntos de entrenamiento vs prueba
-        X_train, X_test, y_train, y_test = train_test_split(mat_atr, vec_obj, test_size = .33, random_state = 15820)
-        # estandarizamos conjunto de entrenamiento
-        X_train_std = StandardScaler().fit_transform(X_train)
-        X_test_std = StandardScaler().fit_transform(X_test)
-        # ajustamos modelo sin alterar hiperparámetros
-        modelo_x =  LogisticRegression().fit(X_train_std, y_train)
-        # prediccion de clases y probabilidad
-        y_hat = modelo_x.predict(X_test_std)
-        return modelo_x, y_test, y_hat
+    Returns:
+            array: vector de prueba y vector de predicciones
+    """
+    # separando matriz de atributos de vector objetivo
+    # utilizamos dataframe con variables significativas
+    mat_atr = df.drop(var_obj, axis=1)
+    vec_obj = df[var_obj]
+    # split de conjuntos de entrenamiento vs prueba
+    X_train, X_test, y_train, y_test = train_test_split(mat_atr, vec_obj, test_size = .33, random_state = 15820)
+    # estandarizamos conjunto de entrenamiento
+    X_train_std = StandardScaler().fit_transform(X_train)
+    X_test_std = StandardScaler().fit_transform(X_test)
+    # ajustamos modelo sin alterar hiperparámetros
+    modelo_x =  LogisticRegression().fit(X_train_std, y_train)
+    # prediccion de clases y probabilidad
+    y_hat = modelo_x.predict(X_test_std)
+    return modelo_x, y_test, y_hat
 
 def report_scores(y_predict, y_validate):
     """Calcula el error cuadrático medio y el r2 score entre dos vectores. 
@@ -199,17 +199,27 @@ def polynomial_degrees(m=50):
     plt.tight_layout()
 
 def cv_error(x_train,y_train,k, method = 'OLS', alpha = 1):
+    """Funcion que calcula el error de la validacion cruzada.
+        Args:
+        x_train: Matris de atributos 
+        y_train: vector objetivo
+        k: Kfolds
+        method: False = 'OLS', modelo lineal 'OLS', 'ridge', 'lasso', 'enet' 
+        Returns:
+            r2_score, mean_squared_error, median_absolute_error
+    """
 
-    # set training attr matrix and target
+    # Entrnar matris de atributos y vector objetivo
     Xm, ym = x_train.to_numpy(), y_train.to_numpy()
-    # define kfold manual split
+
+    #Definir KFold division manual
     kf = KFold(n_splits=k)
-    # set rmse to 0
+    # set rmse a 0
     rmse_cv = 0
-    # register coefficients
+    # cueficientes
     coef_v = []
 
-    # infer model class given function argument
+    # Seleccion del modelo
     if method is 'OLS':
         method_type = lm.LinearRegression(fit_intercept=False)
     elif method is 'ridge':
@@ -219,25 +229,25 @@ def cv_error(x_train,y_train,k, method = 'OLS', alpha = 1):
     elif method is 'enet':
         method_type = lm.ElasticNet(alpha=alpha, fit_intercept=False)
     else:
-        # raise error if argument isn't valid
-        raise TypeError("Method argument is not valid")
+        # error de argumento no valido
+        raise TypeError("Argumento 'method' no valido")
 
-    # for each partition
+    # para cada variable
     for train_index, validation_index in kf.split(Xm):
-        # instantiate model
+        # instaciar modelo
         method_type = method_type
-        # fit on randomized training
+
         method_type.fit(Xm[train_index], ym[train_index])
-        # append estimates
+
         coef_v.append(method_type.coef_)
-        # create predictions
+        # predicciones
         yhat_validation = method_type.predict(Xm[validation_index])
-        # update rmse metric
+        # actualizar metricas
         rmse_cv += np.mean(np.power(yhat_validation - ym[validation_index], 2))
 
-    # create a dataframe containing coeficients
+    # crear dataframe de coeficientes
     coefs_dataframe = pd.DataFrame(
-        # for each inner array, rearrange coeficients
+        # fpara cada matriz interna, reorganizar los coeficientes
         [[fold[x] for x in range(x_train.shape[1])] for fold in coef_v]
     )
 
@@ -245,8 +255,14 @@ def cv_error(x_train,y_train,k, method = 'OLS', alpha = 1):
     return coefs_dataframe, rmse_cv
 
 def report_metrics(model, x_test, y_test):
-        preds = model.predict(x_test)
-        print(f'''
-        Test R2: {r2_score(y_test, preds)}
-        Test MSE: {mean_squared_error(y_test, preds)}
-        Test Median Absolute Error: {median_absolute_error(y_test, preds)}''')
+    """Funcion que imprime las metricas de un modelo.
+        Args:
+        model (modelo): modelo lineal
+        Returns:
+            r2_score, mean_squared_error, median_absolute_error
+    """
+    preds = model.predict(x_test)
+    print(f'''
+    Test R2: {r2_score(y_test, preds)}
+    Test MSE: {mean_squared_error(y_test, preds)}
+    Test Median Absolute Error: {median_absolute_error(y_test, preds)}''')
