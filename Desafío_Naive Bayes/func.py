@@ -32,13 +32,13 @@ def dist_box(data):
     Returns:
         distplots: con todas las variables del df
     """
-    #Name=data.name.upper()
+    Name=data.name.upper()
     fig,(ax_box,ax_dis) = plt.subplots(nrows=2,sharex=True,gridspec_kw = {"height_ratios": (.25, .75)},figsize=(8, 5))
     mean=data.mean()
     median=data.median()
-    #mode=data.mode().tolist()[0]
+    mode=data.mode().tolist()[0]
     sns.set_theme(style="white")
-    fig.suptitle("Distribucion ", fontsize=18, fontweight='bold')#+ Name
+    fig.suptitle("Distribución para "+ Name  , fontsize=18, fontweight='bold')
     sns.boxplot(x=data,showmeans=True, orient='h',color="tan",ax=ax_box)
     ax_box.set(xlabel='')
 
