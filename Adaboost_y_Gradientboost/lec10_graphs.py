@@ -233,4 +233,3 @@ def annotated_barplot(variable):
                         xy=(patch.get_x() + .125, patch.get_height() + 0.01),
                         # inferimos el color de cada barra
                         color=patch.get_facecolor())
-
