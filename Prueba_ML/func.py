@@ -1,6 +1,7 @@
 ﻿
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.metrics import classification_report, accuracy_score, roc_curve, roc_auc_score, confusion_matrix, precision_score, f1_score, recall_score
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
@@ -84,3 +85,42 @@ def nlp_cleaning(df):
     # joining lemmas and removing punctuation
     df['content_clean'] = df['content_token_lemma'].apply(lambda list_: ' '.join([word for word in list_ if word not in string.punctuation]))
     return df
+
+def plot_classification_report(y_true, y_hat):
+    """
+    plot_classification_report: Genera una visualización de los puntajes reportados con la función `sklearn.metrics.classification_report`.
+
+    Parámetros de ingreso:
+        - y_true: Un vector objetivo de validación.
+        - y_hat: Un vector objetivo estimado en función a la matriz de atributos de validación y un modelo entrenado.
+
+    Retorno:
+        - Un gráfico generado con matplotlib.pyplot
+
+    """
+    colors = ['dodgerblue', 'tomato', 'purple', 'orange']
+    avg_p, avg_r, avg_f1 = 0, 0, 0
+    class_labels = np.unique(y_true)
+    
+    for i in class_labels:
+        p = precision_score(y_true, y_hat, pos_label=i)
+        r = recall_score(y_true, y_hat, pos_label=i)
+        f = f1_score(y_true, y_hat, pos_label=i)
+        avg_p += p
+        avg_r += r
+        avg_f1 += f
+        plt.scatter(p, 1, marker='x', color=colors[i])
+        plt.scatter(r, 2, marker='x', color=colors[i])
+        plt.scatter(f, 3, marker='x',color=colors[i], label=f'Class: {i}')
+        
+    avg_p /= len(class_labels)
+    avg_r /= len(class_labels)
+    avg_f1 /= len(class_labels)
+
+    plt.scatter([avg_p, avg_r, avg_f1], [1, 2, 3], marker='o', color='forestgreen', label='Avg')
+    plt.yticks([1.0, 2.0, 3.0], ['Precision', 'Recall', 'f1-Score'])
+
+def confussion_matrix_map(y_test, y_hat, target_label):
+    cnf = confusion_matrix(y_test, y_hat) / len(y_test)
+    target_label = ['negativa', 'positiva']
+    sns.heatmap(cnf, xticklabels=target_label, yticklabels=target_label, annot=True, fmt=".1%", cbar=False, cmap='Blues')

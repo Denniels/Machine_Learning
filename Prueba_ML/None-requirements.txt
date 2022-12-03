@@ -1,9 +1,9 @@
-lazypredict==0.2.12
+func
 matplotlib==3.5.2
 missingno==0.5.1
+nltk==3.7
 numpy==1.22.4
 pandas==1.4.2
-preproc_nyc_sqf
 seaborn==0.11.2
 sinfo==0.3.4
 sklearn==1.1.3
