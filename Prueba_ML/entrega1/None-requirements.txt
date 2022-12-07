@@ -1,0 +1,14 @@
+func
+matplotlib==3.5.2
+missingno==0.5.1
+nltk==3.7
+numpy==1.22.4
+pandas==1.4.2
+seaborn==0.11.2
+sinfo==0.3.4
+sklearn==1.1.3
+IPython==8.4.0
+jupyter_client==7.3.4
+jupyter_core==4.10.0
+jupyterlab==3.4.8
+notebook==6.5.1
